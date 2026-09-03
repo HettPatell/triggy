@@ -85,14 +85,18 @@ const Cart = (() => {
     }
   }
 
-  async function openCart() {
-    await loadCoupons();
+  function openCart() {
+    if (cartDrawerOverlay) {
+      cartDrawerOverlay.classList.add('open');
+    }
     renderCart();
-    cartDrawerOverlay.classList.add('open');
+    loadCoupons().then(() => renderCart()).catch(() => {});
   }
 
   function closeCart() {
-    cartDrawerOverlay.classList.remove('open');
+    if (cartDrawerOverlay) {
+      cartDrawerOverlay.classList.remove('open');
+    }
   }
 
   function updateBadge() {
@@ -100,6 +104,23 @@ const Cart = (() => {
     if (cartBadge) {
       cartBadge.textContent = count;
       cartBadge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+    updateFloatingCartBar();
+  }
+
+  function updateFloatingCartBar() {
+    const bar = document.getElementById('floating-cart-bar');
+    if (!bar) return;
+    const totalItems = cartItems.reduce((acc, it) => acc + it.quantity, 0);
+    if (totalItems > 0) {
+      const subtotal = cartItems.reduce((acc, it) => acc + (it.price * it.quantity), 0);
+      const countEl = document.getElementById('floating-cart-count');
+      const totalEl = document.getElementById('floating-cart-total');
+      if (countEl) countEl.textContent = `${totalItems} ${totalItems === 1 ? 'ITEM' : 'ITEMS'}`;
+      if (totalEl) totalEl.textContent = `₹${Math.round(subtotal)}`;
+      bar.style.display = 'flex';
+    } else {
+      bar.style.display = 'none';
     }
   }
 
