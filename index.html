@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Triggy - Order Food Online from India's Best Restaurants</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Basis+Grotesque+Pro:wght@400;500;700;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='25' fill='%23fc8019'/><text x='50%' y='68%' font-size='65' font-weight='900' fill='white' text-anchor='middle' font-family='sans-serif'>T</text></svg>">
+</head>
+<body>
+
+  <!-- =====================================================================
+       TOP STICKY NAVBAR
+       ===================================================================== -->
+  <header class="header">
+    <div class="container header-inner">
+      <div class="header-left">
+        <!-- Logo -->
+        <div class="logo-wrapper" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+          <div class="logo-icon-box">T</div>
+          <span class="brand-text">triggy</span>
+        </div>
+
+        <!-- Location Selector -->
+        <div class="location-picker" id="loc-picker-btn">
+          <span class="loc-title" id="current-city-text">Indiranagar</span>
+          <span class="loc-area">Bangalore, Karnataka, India</span>
+          <span class="loc-arrow">▼</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav>
+        <ul class="nav-links">
+          <!-- Search -->
+          <li class="nav-item" id="search-nav-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span class="nav-text">Search</span>
+          </li>
+
+          <!-- Favorites -->
+          <li class="nav-item" id="fav-nav-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="nav-text">Favorites</span>
+            <span class="badge-count" id="fav-badge-count" style="display:none;">0</span>
+          </li>
+
+          <!-- Orders -->
+          <li class="nav-item" id="orders-nav-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span class="nav-text">Orders</span>
+          </li>
+
+          <!-- Admin Panel Link in Navbar -->
+          <li class="nav-item">
+            <a href="admin.html" target="_blank" style="display:flex; align-items:center; gap:8px; color:inherit; text-decoration:none;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span class="nav-text" style="color:#fc8019; font-weight:800;">Admin</span>
+            </a>
+          </li>
+
+          <!-- User Account / Sign In -->
+          <li class="nav-item profile-menu-container" id="user-nav-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span class="nav-text" id="user-nav-text">Sign In</span>
+
+            <!-- Profile Dropdown -->
+            <div class="profile-dropdown" id="profile-dropdown">
+              <div style="padding: 12px 18px; border-bottom: 1px solid var(--border-color);">
+                <div style="font-weight:800; font-size:15px;" id="profile-user-name">User Account</div>
+                <div style="font-size:12px; color:var(--text-muted);" id="profile-user-email">user@example.com</div>
+              </div>
+              <div class="profile-drop-item" onclick="App.showPastOrders()">
+                <span>📦 Orders & Tracking</span>
+              </div>
+              <div class="profile-drop-item" onclick="App.showFavoritesModal()">
+                <span>❤️ My Favorites</span>
+              </div>
+              <a href="admin.html" target="_blank" class="profile-drop-item" style="text-decoration:none;">
+                <span>🛡️ Admin Panel</span>
+              </a>
+              <a href="setup_db.php" target="_blank" class="profile-drop-item" style="text-decoration:none;">
+                <span>⚙️ Database Manager</span>
+              </a>
+              <div class="profile-drop-item" id="logout-btn" style="color:var(--danger); border-top:1px solid var(--border-color);">
+                <span>🚪 Sign Out</span>
+              </div>
+            </div>
+          </li>
+
+          <!-- Cart -->
+          <li class="nav-item" id="cart-nav-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span class="nav-text">Cart</span>
+            <span class="badge-count" id="cart-badge-count" style="display:none;">0</span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =====================================================================
+       SERVICES TAB BAR
+       ===================================================================== -->
+  <div class="service-tabs-bar">
+    <div class="container">
+      <div class="service-tabs">
+        <button class="service-tab active">
+          <span style="font-size:16px;">🛵</span> Food Delivery
+        </button>
+        <button class="service-tab" onclick="showToast('Triggy Instamart: Grocery delivered in 10 mins! (Demo preview)')">
+          <span style="font-size:16px;">⚡</span> Instamart
+        </button>
+        <button class="service-tab" onclick="showToast('Triggy Dineout: Flat 30% off table reservations! (Demo preview)')">
+          <span style="font-size:16px;">🍽️</span> Dineout
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       MAIN CONTENT
+       ===================================================================== -->
+  <main class="container">
+
+    <!-- Promotional Discount Banners -->
+    <section class="promo-section">
+      <div class="promo-grid">
+        <div class="promo-banner promo-bg-1" onclick="App.quickSearch('Biryani')">
+          <div class="promo-content">
+            <span class="promo-tag">Grand Feast</span>
+            <h3 class="promo-title">UPTO 60% OFF</h3>
+            <p class="promo-desc">On royal biryanis & spicy curries</p>
+          </div>
+          <img class="promo-badge-img" src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=300&auto=format&fit=crop&q=80" alt="Biryani">
+        </div>
+
+        <div class="promo-banner promo-bg-2" onclick="Cart.quickApplyCoupon('FREEDEL'); Cart.openCart();">
+          <div class="promo-content">
+            <span class="promo-tag">Free Delivery</span>
+            <h3 class="promo-title">ZERO DELIVERY FEE</h3>
+            <p class="promo-desc">Use code FREEDEL on all orders</p>
+          </div>
+          <img class="promo-badge-img" src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&auto=format&fit=crop&q=80" alt="Pizza">
+        </div>
+
+        <div class="promo-banner promo-bg-3" onclick="App.quickSearch('Burger')">
+          <div class="promo-content">
+            <span class="promo-tag">Burger Fiesta</span>
+            <h3 class="promo-title">DEALS AT ₹129</h3>
+            <p class="promo-desc">Flame grilled patties & shakes</p>
+          </div>
+          <img class="promo-badge-img" src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300&auto=format&fit=crop&q=80" alt="Burger">
+        </div>
+      </div>
+    </section>
+
+    <!-- "What's on your mind?" Category Circles -->
+    <section style="margin: 28px 0;">
+      <div class="section-header">
+        <h2 class="section-title">What's on your mind?</h2>
+      </div>
+      <div class="categories-carousel" id="categories-list">
+        <div class="category-pill" onclick="App.selectCategory('biryani')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=200&auto=format&fit=crop&q=80" alt="Biryani">
+          </div>
+          <span class="cat-label">Biryani</span>
+        </div>
+        <div class="category-pill" onclick="App.selectCategory('pizza')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&auto=format&fit=crop&q=80" alt="Pizzas">
+          </div>
+          <span class="cat-label">Pizzas</span>
+        </div>
+        <div class="category-pill" onclick="App.selectCategory('burger')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&auto=format&fit=crop&q=80" alt="Burgers">
+          </div>
+          <span class="cat-label">Burgers</span>
+        </div>
+        <div class="category-pill" onclick="App.selectCategory('north-indian')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=200&auto=format&fit=crop&q=80" alt="North Indian">
+          </div>
+          <span class="cat-label">North Indian</span>
+        </div>
+        <div class="category-pill" onclick="App.selectCategory('chinese')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=200&auto=format&fit=crop&q=80" alt="Chinese">
+          </div>
+          <span class="cat-label">Chinese</span>
+        </div>
+        <div class="category-pill" onclick="App.selectCategory('rolls')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=200&auto=format&fit=crop&q=80" alt="Rolls">
+          </div>
+          <span class="cat-label">Rolls</span>
+        </div>
+        <div class="category-pill" onclick="App.selectCategory('south-indian')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?w=200&auto=format&fit=crop&q=80" alt="South Indian">
+          </div>
+          <span class="cat-label">South Indian</span>
+        </div>
+        <div class="category-pill" onclick="App.selectCategory('desserts')">
+          <div class="cat-img-box">
+            <img src="https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=200&auto=format&fit=crop&q=80" alt="Desserts">
+          </div>
+          <span class="cat-label">Desserts</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters & Sort Bar -->
+    <section>
+      <div class="section-header">
+        <h2 class="section-title">Top restaurant chains in Bangalore</h2>
+      </div>
+
+      <div class="filters-bar">
+        <!-- Sort Dropdown -->
+        <div class="filter-chip">
+          <span>⇅</span>
+          <select id="sort-select">
+            <option value="default">Relevance (Default)</option>
+            <option value="rating">Rating: High to Low</option>
+            <option value="delivery_time">Delivery Time: Fastest</option>
+            <option value="price_low">Cost: Low to High</option>
+            <option value="price_high">Cost: High to Low</option>
+          </select>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="filter-chip" data-filter="fast">
+          <span>⚡ Fast Delivery (&lt; 25 mins)</span>
+        </div>
+        <div class="filter-chip" data-filter="veg">
+          <span class="diet-icon veg"><span class="diet-icon-dot"></span></span>
+          <span>Pure Veg</span>
+        </div>
+        <div class="filter-chip" data-filter="rating">
+          <span>★ Ratings 4.0+</span>
+        </div>
+      </div>
+
+      <!-- Restaurant Cards Grid -->
+      <div class="restaurants-grid" id="restaurants-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+  </main>
+
+  <!-- =====================================================================
+       SEARCH MODAL OVERLAY
+       ===================================================================== -->
+  <div class="search-modal-overlay" id="search-modal-overlay">
+    <div class="search-container" id="search-container-box">
+      <div class="search-header-bar">
+        <div class="search-input-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="search-input" placeholder="Search for restaurants and food (e.g. Biryani, Pizza, Burger...)" autocomplete="off">
+        </div>
+        <button class="search-close-btn" id="search-close-btn">✕</button>
+      </div>
+
+      <div class="search-body">
+        <div style="font-size:13px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Popular Cuisines</div>
+        <div class="popular-chips-wrap">
+          <span class="popular-chip" onclick="App.quickSearch('Chicken Biryani')">🍗 Chicken Biryani</span>
+          <span class="popular-chip" onclick="App.quickSearch('Pizza')">🍕 Margherita Pizza</span>
+          <span class="popular-chip" onclick="App.quickSearch('Burger')">🍔 Whopper Burger</span>
+          <span class="popular-chip" onclick="App.quickSearch('Paneer')">🧀 Paneer Tikka</span>
+          <span class="popular-chip" onclick="App.quickSearch('Noodles')">🍜 Hakka Noodles</span>
+          <span class="popular-chip" onclick="App.quickSearch('Momos')">🥟 Steamed Momos</span>
+          <span class="popular-chip" onclick="App.quickSearch('Waffle')">🧇 Belgian Waffle</span>
+          <span class="popular-chip" onclick="App.quickSearch('Gulab Jamun')">🍯 Gulab Jamun</span>
+        </div>
+
+        <div id="search-results-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       RESTAURANT MENU MODAL
+       ===================================================================== -->
+  <div class="rest-modal-overlay" id="rest-modal-overlay">
+    <div class="rest-modal-card">
+      <div class="rest-modal-header">
+        <button class="rest-modal-close" id="rest-modal-close">✕</button>
+        <div class="rest-details-box">
+          <div>
+            <h2 class="rest-head-title" id="rest-head-name">Restaurant Name</h2>
+            <div class="rest-head-cuisines" id="rest-head-cuisine">Cuisines</div>
+            <div class="rest-head-address" id="rest-head-addr">Address</div>
+          </div>
+          <div class="rest-rating-box">
+            <div class="rest-rating-val" id="rest-head-rating-val">★ 4.5</div>
+            <div class="rest-rating-cnt" id="rest-head-rating-cnt">1K+ ratings</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rest-modal-controls">
+        <label class="veg-toggle-wrap">
+          <input type="checkbox" id="rest-modal-veg-toggle" style="accent-color:var(--veg-color); width:18px; height:18px;">
+          <span>Veg Only</span>
+        </label>
+        <div style="font-size:13px; color:var(--text-muted); font-weight:600;">Freshly prepared on order</div>
+      </div>
+
+      <div class="menu-items-scroll-area" id="rest-menu-scroll-area">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       CART SLIDE-OVER DRAWER
+       ===================================================================== -->
+  <div class="cart-drawer-overlay" id="cart-drawer-overlay">
+    <div class="cart-drawer">
+      <div class="cart-header">
+        <div class="cart-header-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span>Order Cart</span>
+        </div>
+        <button class="cart-close-btn" id="cart-close-btn">✕</button>
+      </div>
+
+      <div class="cart-body" id="cart-body">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="cart-footer" id="cart-footer" style="display:none;">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       CHECKOUT & PAYMENT MODAL
+       ===================================================================== -->
+  <div class="payment-modal-overlay" id="payment-modal-overlay">
+    <div class="payment-card">
+      <div class="payment-header">
+        <div class="payment-title">Select Payment Method</div>
+        <button class="cart-close-btn" id="payment-close-btn">✕</button>
+      </div>
+
+      <div class="payment-body">
+        <div class="payment-methods">
+          <!-- UPI -->
+          <label class="payment-option active">
+            <input type="radio" name="payment_method" value="UPI" checked>
+            <div class="pay-opt-info">
+              <div class="pay-opt-name">UPI / Google Pay / PhonePe / Paytm</div>
+              <div class="pay-opt-desc">Instant & secure 1-click verification</div>
+            </div>
+          </label>
+
+          <!-- Cards -->
+          <label class="payment-option">
+            <input type="radio" name="payment_method" value="CARD">
+            <div class="pay-opt-info">
+              <div class="pay-opt-name">Credit or Debit Cards</div>
+              <div class="pay-opt-desc">Visa, Mastercard, RuPay, Amex</div>
+            </div>
+          </label>
+
+          <!-- Net Banking -->
+          <label class="payment-option">
+            <input type="radio" name="payment_method" value="NET_BANKING">
+            <div class="pay-opt-info">
+              <div class="pay-opt-name">Net Banking</div>
+              <div class="pay-opt-desc">All major Indian banks supported</div>
+            </div>
+          </label>
+
+          <!-- COD -->
+          <label class="payment-option">
+            <input type="radio" name="payment_method" value="COD">
+            <div class="pay-opt-info">
+              <div class="pay-opt-name">Cash on Delivery (COD)</div>
+              <div class="pay-opt-desc">Pay cash or scan QR upon delivery</div>
+            </div>
+          </label>
+        </div>
+
+        <button class="confirm-pay-btn" id="confirm-pay-btn">
+          PAY <span id="pay-amount-display">₹0</span> & PLACE ORDER
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       ORDER TRACKING & HISTORY MODAL
+       ===================================================================== -->
+  <div class="order-modal-overlay" id="order-modal-overlay">
+    <div class="order-tracking-card">
+      <button class="cart-close-btn" id="order-modal-close" style="float:right;">✕</button>
+      <div id="tracking-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       LOCATION SELECTOR MODAL
+       ===================================================================== -->
+  <div class="order-modal-overlay" id="loc-modal-overlay">
+    <div class="order-tracking-card" style="max-width:440px;">
+      <button class="cart-close-btn" id="loc-close-btn" style="float:right;">✕</button>
+      <h3 style="font-size:20px; font-weight:800; margin-bottom:16px;">Choose Your Location</h3>
+      <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Select from popular delivery zones:</p>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <button class="filter-chip" style="justify-content:flex-start; padding:12px 18px; font-size:15px;" onclick="App.selectCity('Bangalore (Koramangala & Indiranagar)')">
+          📍 Bangalore (Koramangala / Indiranagar)
+        </button>
+        <button class="filter-chip" style="justify-content:flex-start; padding:12px 18px; font-size:15px;" onclick="App.selectCity('Mumbai (Bandra & Andheri)')">
+          📍 Mumbai (Bandra / Andheri)
+        </button>
+        <button class="filter-chip" style="justify-content:flex-start; padding:12px 18px; font-size:15px;" onclick="App.selectCity('Delhi (Connaught Place & South Ex)')">
+          📍 Delhi (Connaught Place / South Ex)
+        </button>
+        <button class="filter-chip" style="justify-content:flex-start; padding:12px 18px; font-size:15px;" onclick="App.selectCity('Hyderabad (Hitech City & Jubilee Hills)')">
+          📍 Hyderabad (Hitech City / Jubilee Hills)
+        </button>
+        <button class="filter-chip" style="justify-content:flex-start; padding:12px 18px; font-size:15px;" onclick="App.selectCity('Pune (Koregaon Park & Hinjewadi)')">
+          📍 Pune (Koregaon Park / Hinjewadi)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       AUTH SLIDE-OVER DRAWER (Sign In / Register)
+       ===================================================================== -->
+  <div class="auth-drawer-overlay" id="auth-drawer-overlay">
+    <div class="auth-drawer">
+      <button class="auth-close-btn" id="auth-close-btn">✕</button>
+
+      <div class="auth-header-wrap">
+        <div>
+          <h2 class="auth-title" id="auth-title">Login</h2>
+          <div class="auth-sub-link" id="auth-toggle-link">
+            or <span style="text-decoration:underline;">create an account</span>
+          </div>
+        </div>
+        <img class="auth-hero-img" src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/Image-login_btpq7r" alt="Swiggy Food Roll">
+      </div>
+
+      <form class="auth-form" id="auth-form">
+        <div class="form-group" id="name-group" style="display:none;">
+          <label for="auth-name">Full Name</label>
+          <input type="text" id="auth-name" placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label for="auth-email">Email Address</label>
+          <input type="email" id="auth-email" placeholder="name@example.com" value="rahul@example.com" required>
+        </div>
+
+        <div class="form-group" id="phone-group" style="display:none;">
+          <label for="auth-phone">Phone Number</label>
+          <input type="tel" id="auth-phone" placeholder="10-digit mobile number">
+        </div>
+
+        <div class="form-group">
+          <label for="auth-password">Password</label>
+          <input type="password" id="auth-password" placeholder="Enter password (default: swiggy123)" value="swiggy123" required>
+        </div>
+
+        <button type="submit" class="auth-submit-btn" id="auth-submit-btn">LOGIN</button>
+
+        <p class="auth-terms">
+          By clicking on Login / Sign up, I accept the <strong>Terms &amp; Conditions</strong> &amp; <strong>Privacy Policy</strong>.
+        </p>
+
+        <div style="margin-top:16px; background:#fff6ee; border:1px dashed #fc8019; padding:10px 14px; border-radius:8px; font-size:12px; color:#686b78;">
+          💡 <strong>Demo Credentials:</strong><br>
+          Email: <code>rahul@example.com</code> | Password: <code>swiggy123</code>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       FOOTER
+       ===================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="logo-wrapper">
+            <div class="logo-icon-box">T</div>
+            <span class="brand-text" style="color:#fff;">triggy</span>
+          </div>
+          <p class="footer-brand-desc">
+            Order delicious food online from thousands of top-rated restaurants near you. Fast doorstep delivery, live order tracking, and exclusive discounts.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Triggy Corporate</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Team</a></li>
+            <li><a href="#">Triggy One</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Contact Us</h4>
+          <ul class="footer-links">
+            <li><a href="#">Help &amp; Support</a></li>
+            <li><a href="#">Partner with us</a></li>
+            <li><a href="#">Ride with us</a></li>
+            <li><a href="admin.html" target="_blank">Admin Panel</a></li>
+            <li><a href="setup_db.php" target="_blank">Database Status</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">We Deliver To</h4>
+          <ul class="footer-links">
+            <li><a href="#">Bangalore</a></li>
+            <li><a href="#">Mumbai</a></li>
+            <li><a href="#">Delhi NCR</a></li>
+            <li><a href="#">Hyderabad</a></li>
+            <li><a href="#">Chennai</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        © 2026 Triggy Ltd. Built with HTML, CSS, JavaScript, PHP &amp; MySQL.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/cart.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

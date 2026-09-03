@@ -1,0 +1,12 @@
+[
+  {
+    "code": "FREEDEL",
+    "title": "FREE DELIVERY",
+    "description": "Zero delivery fee on any order amount",
+    "type": "fixed",
+    "value": 35.0,
+    "max_discount": 35.0,
+    "min_order": 99.0,
+    "status": "ACTIVE"
+  }
+]
