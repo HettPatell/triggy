@@ -51,7 +51,10 @@ const Auth = (() => {
     }
 
     if (userNavBtn) {
-      userNavBtn.addEventListener('click', () => {
+      userNavBtn.addEventListener('click', (e) => {
+        if (profileDropdown && profileDropdown.contains(e.target) && e.target !== profileDropdown) {
+          return;
+        }
         if (currentUser) {
           profileDropdown.classList.toggle('open');
         } else {
@@ -84,8 +87,10 @@ const Auth = (() => {
     if (currentUser) {
       const firstName = currentUser.name ? currentUser.name.split(' ')[0] : 'Account';
       userNavText.textContent = firstName;
-      document.getElementById('profile-user-name').textContent = currentUser.name || 'Food Lover';
-      document.getElementById('profile-user-email').textContent = currentUser.email || '';
+      const nameEl = document.getElementById('profile-user-name');
+      const emailEl = document.getElementById('profile-user-email');
+      if (nameEl) nameEl.textContent = currentUser.name || 'Food Lover';
+      if (emailEl) emailEl.textContent = currentUser.email || '';
     } else {
       userNavText.textContent = 'Sign In';
     }
@@ -94,11 +99,13 @@ const Auth = (() => {
   function openAuthDrawer(signUp = false) {
     isSignUpMode = signUp;
     updateModalView();
-    authDrawerOverlay.classList.add('open');
+    const overlay = document.getElementById('auth-drawer-overlay');
+    if (overlay) overlay.classList.add('open');
   }
 
   function closeAuthDrawer() {
-    authDrawerOverlay.classList.remove('open');
+    const overlay = document.getElementById('auth-drawer-overlay');
+    if (overlay) overlay.classList.remove('open');
   }
 
   function toggleAuthMode() {
@@ -107,18 +114,24 @@ const Auth = (() => {
   }
 
   function updateModalView() {
+    const title = document.getElementById('auth-title');
+    const toggleLink = document.getElementById('auth-toggle-link');
+    const nameG = document.getElementById('name-group');
+    const phoneG = document.getElementById('phone-group');
+    const sBtn = document.getElementById('auth-submit-btn');
+
     if (isSignUpMode) {
-      authTitle.textContent = 'Sign up';
-      authToggleText.innerHTML = 'or <span style="text-decoration:underline;">login to your account</span>';
-      nameGroup.style.display = 'flex';
-      phoneGroup.style.display = 'flex';
-      submitBtn.textContent = 'CONTINUE';
+      if (title) title.textContent = 'Sign up';
+      if (toggleLink) toggleLink.innerHTML = 'or <span style="text-decoration:underline;">login to your account</span>';
+      if (nameG) nameG.style.display = 'flex';
+      if (phoneG) phoneG.style.display = 'flex';
+      if (sBtn) sBtn.textContent = 'CONTINUE';
     } else {
-      authTitle.textContent = 'Login';
-      authToggleText.innerHTML = 'or <span style="text-decoration:underline;">create an account</span>';
-      nameGroup.style.display = 'none';
-      phoneGroup.style.display = 'none';
-      submitBtn.textContent = 'LOGIN';
+      if (title) title.textContent = 'Login';
+      if (toggleLink) toggleLink.innerHTML = 'or <span style="text-decoration:underline;">create an account</span>';
+      if (nameG) nameG.style.display = 'none';
+      if (phoneG) phoneG.style.display = 'none';
+      if (sBtn) sBtn.textContent = 'LOGIN';
     }
   }
 

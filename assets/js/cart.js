@@ -314,10 +314,11 @@ const Cart = (() => {
             `).join('')}
           </div>
         ` : ''}
+        ${appliedCoupon ? `
           <div style="font-size:12px; color:var(--success); margin-top:8px; font-weight:700;">
-            ✓ ${appliedCoupon.message || 'Coupon Applied!'} (Saved ₹${appliedCoupon.discount})
+            ✓ ${appliedCoupon.message || 'Coupon Applied!'} (Saved ₹${appliedCoupon.discount || 0})
           </div>
-        `}
+        ` : ''}
       </div>
 
       <!-- Bill Breakdown -->
