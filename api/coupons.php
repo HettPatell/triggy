@@ -5,7 +5,16 @@
 
 require_once __DIR__ . '/../config/db.php';
 
-$couponsFile = __DIR__ . '/../database/coupons.json';
+$isVercel = !empty(getenv('VERCEL')) || !empty(getenv('AWS_LAMBDA_FUNCTION_NAME'));
+$baseCouponsFile = __DIR__ . '/../database/coupons.json';
+$couponsFile = $baseCouponsFile;
+
+if ($isVercel) {
+    $couponsFile = '/tmp/coupons.json';
+    if (!file_exists($couponsFile) && file_exists($baseCouponsFile)) {
+        copy($baseCouponsFile, $couponsFile);
+    }
+}
 
 function getCouponsList($file) {
     if (file_exists($file)) {
@@ -27,7 +36,7 @@ function getCouponsList($file) {
 }
 
 function saveCouponsList($file, $coupons) {
-    file_put_contents($file, json_encode(array_values($coupons), JSON_PRETTY_PRINT));
+    @file_put_contents($file, json_encode(array_values($coupons), JSON_PRETTY_PRINT));
 }
 
 $action = isset($_GET['action']) ? $_GET['action'] : '';

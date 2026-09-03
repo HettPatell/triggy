@@ -4,10 +4,11 @@
  * Supports both MySQL (default for XAMPP / production) and SQLite (automatic zero-config fallback)
  */
 
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'swiggy_clone');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
+define('DB_PORT', getenv('DB_PORT') ?: '3306');
+define('DB_NAME', getenv('DB_NAME') ?: 'swiggy_clone');
+define('DB_USER', getenv('DB_USER') ?: 'root');
+define('DB_PASS', getenv('DB_PASS') !== false ? getenv('DB_PASS') : '');
 
 function getDB() {
     static $pdo = null;
@@ -18,7 +19,8 @@ function getDB() {
     $dbType = 'mysql';
     try {
         // First try connecting to MySQL
-        $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $port = DB_PORT;
+        $dsn = "mysql:host=" . DB_HOST . ";port={$port};dbname=" . DB_NAME . ";charset=utf8mb4";
         $options = [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -29,7 +31,7 @@ function getDB() {
         // If MySQL fails (e.g. database not created or MySQL not running),
         // check if MySQL server is running without the database created yet
         try {
-            $rootDsn = "mysql:host=" . DB_HOST . ";charset=utf8mb4";
+            $rootDsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";charset=utf8mb4";
             $rootPdo = new PDO($rootDsn, DB_USER, DB_PASS, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
             $rootPdo->exec("CREATE DATABASE IF NOT EXISTS `" . DB_NAME . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
@@ -38,11 +40,16 @@ function getDB() {
         } catch (Exception $ex) {
             // MySQL server is not running or accessible. Fallback gracefully to SQLite!
             $dbType = 'sqlite';
-            $dbDir = __DIR__ . '/../database';
-            if (!is_dir($dbDir)) {
-                mkdir($dbDir, 0777, true);
+            $isVercel = !empty(getenv('VERCEL')) || !empty(getenv('AWS_LAMBDA_FUNCTION_NAME'));
+            if ($isVercel) {
+                $sqlitePath = '/tmp/swiggy.sqlite';
+            } else {
+                $dbDir = __DIR__ . '/../database';
+                if (!is_dir($dbDir)) {
+                    mkdir($dbDir, 0777, true);
+                }
+                $sqlitePath = $dbDir . '/swiggy.sqlite';
             }
-            $sqlitePath = $dbDir . '/swiggy.sqlite';
             $pdo = new PDO("sqlite:" . $sqlitePath, null, null, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
