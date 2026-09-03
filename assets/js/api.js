@@ -175,19 +175,24 @@ const API = (() => {
     return JSON.parse(JSON.stringify(INITIAL_MENU));
   }
 
-  // Helper fetch with error handling
+  // Helper fetch with error handling and 2.5s timeout
   async function fetchJSON(url, options = {}) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2500);
     try {
       const res = await fetch(url, {
         headers: { 'Content-Type': 'application/json', ...options.headers },
+        signal: controller.signal,
         ...options
       });
+      clearTimeout(timer);
       if (!res.ok) {
         const errData = await res.json().catch(() => ({ message: 'Server error' }));
         throw new Error(errData.message || `Request failed with status ${res.status}`);
       }
       return await res.json();
     } catch (err) {
+      clearTimeout(timer);
       console.warn(`[API] Fallback triggered for ${url}:`, err.message);
       return null;
     }
@@ -227,12 +232,15 @@ const API = (() => {
     // Single Restaurant Menu
     async getRestaurantMenu(id, vegOnly = false) {
       const res = await fetchJSON(`${BASE_URL}/restaurants.php?id=${id}&veg_only=${vegOnly ? 1 : 0}`);
-      if (res && res.success) return res;
+      if (res && res.success && res.menu_items && res.menu_items.length > 0) return res;
 
-      // Mock Fallback
-      const rest = getStoredRestaurants().find(r => r.id == id) || getStoredRestaurants()[0];
+      // Robust Mock Fallback
+      const allR = getStoredRestaurants();
+      const rest = allR.find(r => r.id == id) || allR[0];
       const menuStore = getStoredMenu();
-      let items = menuStore[id] || [];
+      let items = (menuStore && menuStore[id] && menuStore[id].length > 0)
+        ? menuStore[id]
+        : (INITIAL_MENU[id] || INITIAL_MENU[1]);
 
       if (vegOnly) items = items.filter(i => i.is_veg === 1);
 
