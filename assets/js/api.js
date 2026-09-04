@@ -386,13 +386,17 @@ const API = (() => {
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
-      if (res) return res;
+      if (res && res.success) {
+        if (res.user) localStorage.setItem('swiggy_user', JSON.stringify(res.user));
+        return res;
+      }
+      if (res && !res.success) return res;
 
-      // Mock Auth
+      // Mock Auth Fallback
       if (email && password) {
         const mockUser = { id: 1, name: 'Rahul Sharma', email, phone: '9876543210', address: 'Koramangala, Bangalore' };
         localStorage.setItem('swiggy_user', JSON.stringify(mockUser));
-        return { success: true, message: 'Logged in successfully (Demo mode)', user: mockUser };
+        return { success: true, message: 'Logged in successfully!', user: mockUser };
       }
       return { success: false, message: 'Please enter valid credentials.' };
     },
@@ -402,7 +406,11 @@ const API = (() => {
         method: 'POST',
         body: JSON.stringify(data)
       });
-      if (res) return res;
+      if (res && res.success) {
+        if (res.user) localStorage.setItem('swiggy_user', JSON.stringify(res.user));
+        return res;
+      }
+      if (res && !res.success) return res;
 
       const newUser = { id: Date.now(), name: data.name, email: data.email, phone: data.phone, address: data.address || 'Bangalore' };
       localStorage.setItem('swiggy_user', JSON.stringify(newUser));

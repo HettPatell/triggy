@@ -77,7 +77,7 @@
           </li>
 
           <!-- User Account / Sign In -->
-          <li class="nav-item profile-menu-container" id="user-nav-btn">
+          <li class="nav-item profile-menu-container" id="user-nav-btn" onclick="Auth.handleUserNavClick(event)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
@@ -362,6 +362,17 @@
           <div class="auth-hero-img-box">
             <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=150&auto=format&fit=crop&q=80" alt="Food Wrap" class="auth-hero-img">
           </div>
+        </div>
+
+        <!-- Quick Demo Login Banner -->
+        <div style="background:#fff4eb; border:1px solid #fed7aa; border-radius:10px; padding:12px 14px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <div>
+            <div style="font-size:11px; font-weight:800; color:#ea580c; text-transform:uppercase; letter-spacing:0.5px;">Quick 1-Click Login</div>
+            <div style="font-size:13px; color:#9a3412; font-weight:700;">rahul@example.com</div>
+          </div>
+          <button type="button" onclick="Auth.quickDemoLogin()" style="background:#fc8019; color:#fff; border:none; padding:8px 14px; border-radius:6px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(252,128,25,0.3);">
+            ⚡ LOGIN
+          </button>
         </div>
 
         <form id="auth-form" class="auth-form">

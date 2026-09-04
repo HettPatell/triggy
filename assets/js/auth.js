@@ -187,14 +187,54 @@ const Auth = (() => {
     await API.logout();
     currentUser = null;
     updateUserUI();
-    profileDropdown.classList.remove('open');
+    const dropdown = document.getElementById('profile-dropdown');
+    if (dropdown) dropdown.classList.remove('open');
     showToast('Logged out successfully', 'success');
+  }
+
+  function handleUserNavClick(e) {
+    if (e) e.stopPropagation();
+    const dropdown = document.getElementById('profile-dropdown');
+    if (currentUser) {
+      if (dropdown) dropdown.classList.toggle('open');
+    } else {
+      openAuthDrawer();
+    }
+  }
+
+  async function quickDemoLogin() {
+    if (emailInput) emailInput.value = 'rahul@example.com';
+    if (passwordInput) passwordInput.value = '123456';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in...';
+    }
+    try {
+      const res = await API.login('rahul@example.com', '123456');
+      if (res && res.success) {
+        currentUser = res.user;
+        updateUserUI();
+        closeAuthDrawer();
+        showToast(`Welcome, ${currentUser.name}! 🎉`, 'success');
+      } else {
+        showToast(res ? res.message : 'Login failed', 'error');
+      }
+    } catch (err) {
+      showToast('Login failed. Please try again.', 'error');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'LOGIN';
+      }
+    }
   }
 
   return {
     init,
     openAuthDrawer,
     closeAuthDrawer,
+    handleUserNavClick,
+    quickDemoLogin,
     getUser: () => currentUser
   };
 })();
