@@ -382,6 +382,15 @@ const API = (() => {
 
     // Auth
     async login(email, password) {
+      // 1. Check local registered users list first (allows new accounts created on Vercel to log in instantly!)
+      const usersList = JSON.parse(localStorage.getItem('swiggy_users_list') || '[]');
+      const localMatched = usersList.find(u => (u.email && u.email.toLowerCase() === email.toLowerCase()) || (u.phone && u.phone === email));
+      if (localMatched && (!localMatched.password || localMatched.password === password)) {
+        localStorage.setItem('swiggy_user', JSON.stringify(localMatched));
+        return { success: true, message: `Welcome back, ${localMatched.name}!`, user: localMatched };
+      }
+
+      // 2. Try backend API
       const res = await fetchJSON(`${BASE_URL}/auth.php?action=login`, {
         method: 'POST',
         body: JSON.stringify({ email, password })
@@ -390,31 +399,65 @@ const API = (() => {
         if (res.user) localStorage.setItem('swiggy_user', JSON.stringify(res.user));
         return res;
       }
-      if (res && !res.success) return res;
 
-      // Mock Auth Fallback
-      if (email && password) {
-        const mockUser = { id: 1, name: 'Rahul Sharma', email, phone: '9876543210', address: 'Koramangala, Bangalore' };
+      // 3. Demo fallback credentials
+      if (email.toLowerCase() === 'rahul@example.com' && (password === '123456' || password === 'swiggy123')) {
+        const mockUser = { id: 1, name: 'Rahul Sharma', email: 'rahul@example.com', phone: '9876543210', address: 'Flat 402, Sunshine Heights, Koramangala 4th Block, Bangalore' };
         localStorage.setItem('swiggy_user', JSON.stringify(mockUser));
         return { success: true, message: 'Logged in successfully!', user: mockUser };
       }
-      return { success: false, message: 'Please enter valid credentials.' };
+
+      if (res && !res.success) return res;
+
+      return { success: false, message: 'Invalid credentials. Click "create an account" to register!' };
     },
 
     async register(data) {
-      const res = await fetchJSON(`${BASE_URL}/auth.php?action=register`, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
+      let res = null;
+      try {
+        res = await fetchJSON(`${BASE_URL}/auth.php?action=register`, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+      } catch (e) {}
+
       if (res && res.success) {
         if (res.user) localStorage.setItem('swiggy_user', JSON.stringify(res.user));
+        // Save to users list
+        const usersList = JSON.parse(localStorage.getItem('swiggy_users_list') || '[]');
+        usersList.push(res.user);
+        localStorage.setItem('swiggy_users_list', JSON.stringify(usersList));
         return res;
       }
-      if (res && !res.success) return res;
 
-      const newUser = { id: Date.now(), name: data.name, email: data.email, phone: data.phone, address: data.address || 'Bangalore' };
+      if (res && res.message && res.message.includes('already exists')) {
+        return res;
+      }
+
+      // Standalone / Vercel Fallback: Create and save user locally so registration NEVER fails!
+      const usersList = JSON.parse(localStorage.getItem('swiggy_users_list') || '[]');
+      const existing = usersList.find(u => u.email && u.email.toLowerCase() === data.email.toLowerCase());
+      if (existing) {
+        return { success: false, message: 'An account with this email already exists. Please login!' };
+      }
+
+      const newUser = {
+        id: Date.now(),
+        name: data.name || 'Food Lover',
+        email: data.email,
+        phone: data.phone || '9876543210',
+        password: data.password,
+        address: data.address || 'Koramangala, Bangalore'
+      };
+      usersList.push(newUser);
+      localStorage.setItem('swiggy_users_list', JSON.stringify(usersList));
       localStorage.setItem('swiggy_user', JSON.stringify(newUser));
-      return { success: true, message: 'Registered successfully!', user: newUser };
+
+      return {
+        success: true,
+        message: 'Registration successful! Welcome to Triggy. 🎉',
+        user: newUser
+      };
     },
 
     async logout() {

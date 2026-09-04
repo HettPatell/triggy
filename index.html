@@ -445,44 +445,88 @@
       <div class="payment-body">
         <div class="payment-methods">
           <!-- UPI -->
-          <label class="payment-option active">
+          <label class="payment-option active" id="pay-opt-upi" onclick="Cart.selectPaymentMethod('UPI')">
             <input type="radio" name="payment_method" value="UPI" checked>
             <div class="pay-opt-info">
-              <div class="pay-opt-name">UPI / Google Pay / PhonePe / Paytm</div>
-              <div class="pay-opt-desc">Instant & secure 1-click verification</div>
+              <div class="pay-opt-name">UPI (Google Pay / PhonePe / Paytm / BHIM)</div>
+              <div class="pay-opt-desc">Instant 1-click verification via UPI ID or App</div>
             </div>
+            <span style="font-size:18px;">⚡</span>
           </label>
+
+          <!-- UPI Details Box -->
+          <div id="upi-details-box" style="margin-top:-6px; margin-bottom:6px; padding:12px 14px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px;">
+            <div style="font-size:12px; font-weight:700; color:#166534; margin-bottom:8px;">Enter UPI ID or Choose App:</div>
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
+              <input type="text" id="upi-id-input" placeholder="e.g. yourname@oksbi or mobile@paytm" class="form-input" style="padding:8px 12px; font-size:13px;" value="9876543210@paytm">
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="coupon-tag-pill" style="cursor:pointer;" onclick="document.getElementById('upi-id-input').value='user@okaxis'">🟢 Google Pay</span>
+              <span class="coupon-tag-pill" style="cursor:pointer;" onclick="document.getElementById('upi-id-input').value='user@ybl'">🟣 PhonePe</span>
+              <span class="coupon-tag-pill" style="cursor:pointer;" onclick="document.getElementById('upi-id-input').value='user@paytm'">🔵 Paytm</span>
+            </div>
+          </div>
 
           <!-- Cards -->
-          <label class="payment-option">
+          <label class="payment-option" id="pay-opt-card" onclick="Cart.selectPaymentMethod('CARD')">
             <input type="radio" name="payment_method" value="CARD">
             <div class="pay-opt-info">
-              <div class="pay-opt-name">Credit or Debit Cards</div>
-              <div class="pay-opt-desc">Visa, Mastercard, RuPay, Amex</div>
+              <div class="pay-opt-name">Credit or Debit Card</div>
+              <div class="pay-opt-desc">Visa, Mastercard, RuPay, Maestro</div>
             </div>
+            <span style="font-size:18px;">💳</span>
           </label>
 
+          <!-- Card Details Box -->
+          <div id="card-details-box" style="display:none; margin-top:-6px; margin-bottom:6px; padding:12px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <input type="text" placeholder="Card Number (4532 •••• •••• 8912)" class="form-input" style="padding:8px 12px; font-size:13px;" maxlength="19">
+              <div style="display:flex; gap:8px;">
+                <input type="text" placeholder="MM/YY" class="form-input" style="padding:8px 12px; font-size:13px;" maxlength="5">
+                <input type="password" placeholder="CVV" class="form-input" style="padding:8px 12px; font-size:13px;" maxlength="3">
+              </div>
+            </div>
+          </div>
+
           <!-- Net Banking -->
-          <label class="payment-option">
+          <label class="payment-option" id="pay-opt-net" onclick="Cart.selectPaymentMethod('NET_BANKING')">
             <input type="radio" name="payment_method" value="NET_BANKING">
             <div class="pay-opt-info">
               <div class="pay-opt-name">Net Banking</div>
-              <div class="pay-opt-desc">All major Indian banks supported</div>
+              <div class="pay-opt-desc">HDFC, ICICI, SBI, Axis, Kotak &amp; more</div>
             </div>
+            <span style="font-size:18px;">🏦</span>
           </label>
 
+          <!-- Net Banking Details Box -->
+          <div id="net-details-box" style="display:none; margin-top:-6px; margin-bottom:6px; padding:12px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px;">
+            <select class="form-input" style="padding:8px 12px; font-size:13px;">
+              <option>HDFC Bank</option>
+              <option>State Bank of India (SBI)</option>
+              <option>ICICI Bank</option>
+              <option>Axis Bank</option>
+              <option>Kotak Mahindra Bank</option>
+            </select>
+          </div>
+
           <!-- COD -->
-          <label class="payment-option">
+          <label class="payment-option" id="pay-opt-cod" onclick="Cart.selectPaymentMethod('COD')">
             <input type="radio" name="payment_method" value="COD">
             <div class="pay-opt-info">
               <div class="pay-opt-name">Cash on Delivery (COD)</div>
               <div class="pay-opt-desc">Pay cash or scan QR upon delivery</div>
             </div>
+            <span style="font-size:18px;">💵</span>
           </label>
+
+          <!-- COD Details Box -->
+          <div id="cod-details-box" style="display:none; margin-top:-6px; margin-bottom:6px; padding:10px 14px; background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; font-size:12px; color:#92400e;">
+            💵 Pay via cash or scan delivery partner's QR code on arrival.
+          </div>
         </div>
 
-        <button class="confirm-pay-btn" id="confirm-pay-btn">
-          PAY <span id="pay-amount-display">₹0</span> & PLACE ORDER
+        <button class="confirm-pay-btn" id="confirm-pay-btn" onclick="Cart.handlePaymentConfirmation()">
+          CONFIRM &amp; PAY <span id="pay-amount-display">₹0</span>
         </button>
       </div>
     </div>

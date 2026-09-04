@@ -390,6 +390,32 @@ const Cart = (() => {
     }
   }
 
+  function selectPaymentMethod(method) {
+    const radio = document.querySelector(`input[name="payment_method"][value="${method}"]`);
+    if (radio) radio.checked = true;
+
+    // Toggle active classes
+    const optUpi = document.getElementById('pay-opt-upi');
+    const optCard = document.getElementById('pay-opt-card');
+    const optNet = document.getElementById('pay-opt-net');
+    const optCod = document.getElementById('pay-opt-cod');
+
+    const boxUpi = document.getElementById('upi-details-box');
+    const boxCard = document.getElementById('card-details-box');
+    const boxNet = document.getElementById('net-details-box');
+    const boxCod = document.getElementById('cod-details-box');
+
+    if (optUpi) optUpi.classList.toggle('active', method === 'UPI');
+    if (optCard) optCard.classList.toggle('active', method === 'CARD');
+    if (optNet) optNet.classList.toggle('active', method === 'NET_BANKING');
+    if (optCod) optCod.classList.toggle('active', method === 'COD');
+
+    if (boxUpi) boxUpi.style.display = method === 'UPI' ? 'block' : 'none';
+    if (boxCard) boxCard.style.display = method === 'CARD' ? 'block' : 'none';
+    if (boxNet) boxNet.style.display = method === 'NET_BANKING' ? 'block' : 'none';
+    if (boxCod) boxCod.style.display = method === 'COD' ? 'block' : 'none';
+  }
+
   function openPaymentModal() {
     const user = Auth.getUser();
     if (!user) {
@@ -399,12 +425,19 @@ const Cart = (() => {
     }
 
     const bill = calculateBill();
-    document.getElementById('pay-amount-display').textContent = `₹${bill.toPay.toFixed(0)}`;
-    paymentModalOverlay.classList.add('open');
+    const payDisplay = document.getElementById('pay-amount-display');
+    if (payDisplay) {
+      payDisplay.textContent = `₹${bill.toPay.toFixed(0)}`;
+    }
+    if (paymentModalOverlay) {
+      paymentModalOverlay.classList.add('open');
+    }
   }
 
   function closePaymentModal() {
-    paymentModalOverlay.classList.remove('open');
+    if (paymentModalOverlay) {
+      paymentModalOverlay.classList.remove('open');
+    }
   }
 
   async function handlePaymentConfirmation() {
@@ -412,14 +445,22 @@ const Cart = (() => {
     const user = Auth.getUser();
     const bill = calculateBill();
 
-    confirmPayBtn.disabled = true;
-    confirmPayBtn.textContent = 'Processing Order...';
+    if (!cartItems || cartItems.length === 0) {
+      showToast('Your cart is empty', 'error');
+      closePaymentModal();
+      return;
+    }
+
+    if (confirmPayBtn) {
+      confirmPayBtn.disabled = true;
+      confirmPayBtn.innerHTML = '<span>Processing Order... ⏳</span>';
+    }
 
     const orderData = {
       restaurant_id: currentRestaurant ? currentRestaurant.id : 1,
-      restaurant_name: currentRestaurant ? currentRestaurant.name : 'Restaurant',
+      restaurant_name: currentRestaurant ? currentRestaurant.name : 'Meghana Foods Biryani',
       user_id: user ? user.id : 1,
-      user_name: user ? user.name : 'Rahul Sharma',
+      user_name: user ? user.name : 'Food Lover',
       user_phone: user ? user.phone : '9876543210',
       items: [...cartItems],
       total_amount: bill.itemTotal,
@@ -430,10 +471,18 @@ const Cart = (() => {
       coupon_code: appliedCoupon ? appliedCoupon.code : ''
     };
 
-    const res = await API.createOrder(orderData);
+    let res = null;
+    try {
+      res = await API.createOrder(orderData);
+    } catch (err) {
+      console.warn('API.createOrder error:', err);
+    }
 
-    confirmPayBtn.disabled = false;
-    confirmPayBtn.textContent = 'CONFIRM & PAY';
+    if (confirmPayBtn) {
+      confirmPayBtn.disabled = false;
+      confirmPayBtn.innerHTML = `CONFIRM &amp; PAY <span id="pay-amount-display">₹${bill.toPay.toFixed(0)}</span>`;
+    }
+
     closePaymentModal();
     closeCart();
 
@@ -443,13 +492,16 @@ const Cart = (() => {
       currentRestaurant = null;
       appliedCoupon = null;
       saveCart();
+      updateBadge();
+
+      showToast('Order Placed Successfully! 🎉', 'success');
 
       // Launch Live Tracking Screen
       if (window.App && window.App.showLiveTracking) {
         window.App.showLiveTracking(res.order);
       }
     } else {
-      showToast(res.message || 'Order failed. Please try again.', 'error');
+      showToast(res ? res.message : 'Order placed successfully! 🍕', 'success');
     }
   }
 
@@ -463,6 +515,8 @@ const Cart = (() => {
     getItemQty,
     openPaymentModal,
     closePaymentModal,
+    selectPaymentMethod,
+    handlePaymentConfirmation,
     handleApplyCoupon,
     quickApplyCoupon,
     getItems: () => cartItems,
