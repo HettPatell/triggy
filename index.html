@@ -46,7 +46,7 @@
           </li>
 
           <!-- Favorites -->
-          <li class="nav-item" id="fav-nav-btn">
+          <li class="nav-item hide-on-mobile" id="fav-nav-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
@@ -55,7 +55,7 @@
           </li>
 
           <!-- Orders -->
-          <li class="nav-item" id="orders-nav-btn">
+          <li class="nav-item hide-on-mobile" id="orders-nav-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
@@ -67,7 +67,7 @@
           </li>
 
           <!-- Admin Panel Link in Navbar -->
-          <li class="nav-item">
+          <li class="nav-item hide-on-mobile">
             <a href="admin.html" target="_blank" style="display:flex; align-items:center; gap:8px; color:inherit; text-decoration:none;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
@@ -621,57 +621,6 @@
     </div>
   </div>
 
-  <!-- =====================================================================
-       AUTH SLIDE-OVER DRAWER (Sign In / Register)
-       ===================================================================== -->
-  <div class="auth-drawer-overlay" id="auth-drawer-overlay">
-    <div class="auth-drawer">
-      <button class="auth-close-btn" id="auth-close-btn">✕</button>
-
-      <div class="auth-header-wrap">
-        <div>
-          <h2 class="auth-title" id="auth-title">Login</h2>
-          <div class="auth-sub-link" id="auth-toggle-link">
-            or <span style="text-decoration:underline;">create an account</span>
-          </div>
-        </div>
-        <img class="auth-hero-img" src="https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto/Image-login_btpq7r" alt="Swiggy Food Roll">
-      </div>
-
-      <form class="auth-form" id="auth-form">
-        <div class="form-group" id="name-group" style="display:none;">
-          <label for="auth-name">Full Name</label>
-          <input type="text" id="auth-name" placeholder="Enter your full name">
-        </div>
-
-        <div class="form-group">
-          <label for="auth-email">Email Address</label>
-          <input type="email" id="auth-email" placeholder="name@example.com" value="rahul@example.com" required>
-        </div>
-
-        <div class="form-group" id="phone-group" style="display:none;">
-          <label for="auth-phone">Phone Number</label>
-          <input type="tel" id="auth-phone" placeholder="10-digit mobile number">
-        </div>
-
-        <div class="form-group">
-          <label for="auth-password">Password</label>
-          <input type="password" id="auth-password" placeholder="Enter password (default: swiggy123)" value="swiggy123" required>
-        </div>
-
-        <button type="submit" class="auth-submit-btn" id="auth-submit-btn">LOGIN</button>
-
-        <p class="auth-terms">
-          By clicking on Login / Sign up, I accept the <strong>Terms &amp; Conditions</strong> &amp; <strong>Privacy Policy</strong>.
-        </p>
-
-        <div style="margin-top:16px; background:#fff6ee; border:1px dashed #fc8019; padding:10px 14px; border-radius:8px; font-size:12px; color:#686b78;">
-          💡 <strong>Demo Credentials:</strong><br>
-          Email: <code>rahul@example.com</code> | Password: <code>swiggy123</code>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- =====================================================================
        FOOTER
