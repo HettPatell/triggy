@@ -648,8 +648,10 @@ const App = (() => {
     orderModalOverlay.classList.add('open');
   }
 
+  let cachedOrders = [];
+
   async function showPastOrders() {
-    const orders = await API.getOrders();
+    cachedOrders = await API.getOrders();
     let content = `
       <div class="tracking-header" style="text-align:left; border-bottom:1px solid var(--border-color); padding-bottom:16px;">
         <h2 style="font-size:22px; font-weight:800;">Your Past Orders</h2>
@@ -657,7 +659,7 @@ const App = (() => {
       <div style="margin-top:20px; display:flex; flex-direction:column; gap:20px;">
     `;
 
-    if (!orders || orders.length === 0) {
+    if (!cachedOrders || cachedOrders.length === 0) {
       content += `
         <div style="text-align:center; padding:40px;">
           <h3>No Orders Yet</h3>
@@ -665,11 +667,11 @@ const App = (() => {
         </div>
       `;
     } else {
-      content += orders.map(ord => `
+      content += cachedOrders.map((ord, idx) => `
         <div style="border:1px solid var(--border-color); border-radius:12px; padding:18px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div style="font-size:16px; font-weight:800;">${ord.restaurant_name || 'Restaurant'}</div>
-            <span style="background:#e8f7ed; color:#15803d; font-size:12px; font-weight:700; padding:3px 8px; border-radius:6px;">${ord.order_status || 'DELIVERED'}</span>
+            <span style="background:#e8f7ed; color:#15803d; font-size:12px; font-weight:700; padding:3px 8px; border-radius:6px;">${ord.order_status || 'CONFIRMED'}</span>
           </div>
           <div style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">
             Order #${ord.order_number} • ${new Date(ord.created_at || Date.now()).toLocaleDateString()}
@@ -679,7 +681,7 @@ const App = (() => {
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border-color); padding-top:10px;">
             <div style="font-weight:800; font-size:15px;">Total Paid: ₹${ord.final_amount}</div>
-            <button class="btn" style="background:var(--primary); color:#fff; padding:6px 14px; border-radius:6px; font-size:13px; font-weight:700;" onclick="App.showLiveTracking(${JSON.stringify(ord).replace(/"/g, '&quot;')})">
+            <button class="btn" style="background:var(--primary); color:#fff; padding:6px 14px; border-radius:6px; font-size:13px; font-weight:700;" onclick="App.trackOrderIndex(${idx})">
               TRACK
             </button>
           </div>
@@ -690,6 +692,12 @@ const App = (() => {
     content += `</div>`;
     trackingContainer.innerHTML = content;
     orderModalOverlay.classList.add('open');
+  }
+
+  function trackOrderIndex(idx) {
+    if (cachedOrders && cachedOrders[idx]) {
+      showLiveTracking(cachedOrders[idx]);
+    }
   }
 
   function closeOrderModal() {
@@ -720,6 +728,7 @@ const App = (() => {
     showFavoritesModal,
     showLiveTracking,
     showPastOrders,
+    trackOrderIndex,
     closeOrderModal,
     openLocModal,
     closeLocModal,

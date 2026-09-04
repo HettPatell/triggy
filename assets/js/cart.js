@@ -9,6 +9,7 @@ const Cart = (() => {
   let availableCoupons = [];
   let deliveryAddress = 'Flat 402, Sunshine Heights, Koramangala 4th Block, Bangalore';
   let deliveryInstructions = '';
+  let lastPlacedOrder = null;
 
   // DOM Elements
   const cartDrawerOverlay = document.getElementById('cart-drawer-overlay');
@@ -355,8 +356,8 @@ const Cart = (() => {
 
     // Render footer checkout button
     cartFooter.innerHTML = `
-      <button class="checkout-btn" onclick="Cart.openPaymentModal()">
-        <span>PROCEED TO PAY</span>
+      <button class="checkout-btn" onclick="Cart.openPaymentModal()" style="background:#fc8019;">
+        <span>CONFIRM &amp; PAY</span>
         <span>₹${bill.toPay.toFixed(0)} →</span>
       </button>
     `;
@@ -487,6 +488,8 @@ const Cart = (() => {
     closeCart();
 
     if (res && res.success) {
+      lastPlacedOrder = res.order;
+
       // Clear cart
       cartItems = [];
       currentRestaurant = null;
@@ -494,14 +497,41 @@ const Cart = (() => {
       saveCart();
       updateBadge();
 
-      showToast('Order Placed Successfully! 🎉', 'success');
+      showToast('Payment Successful! 🎉', 'success');
 
-      // Launch Live Tracking Screen
-      if (window.App && window.App.showLiveTracking) {
+      // Populate & Open Order Success Modal
+      const orderNumEl = document.getElementById('success-order-num');
+      const restNameEl = document.getElementById('success-rest-name');
+      const payMethodEl = document.getElementById('success-pay-method');
+      const amountPaidEl = document.getElementById('success-amount-paid');
+
+      if (orderNumEl) orderNumEl.textContent = `#${res.order.order_number || 'TRIG-001'}`;
+      if (restNameEl) restNameEl.textContent = orderData.restaurant_name || 'Restaurant';
+      if (payMethodEl) payMethodEl.textContent = `${selectedMethod} (Verified)`;
+      if (amountPaidEl) amountPaidEl.textContent = `₹${bill.toPay.toFixed(0)}`;
+
+      const successModal = document.getElementById('order-success-modal-overlay');
+      if (successModal) {
+        successModal.classList.add('open');
+      } else if (window.App && window.App.showLiveTracking) {
         window.App.showLiveTracking(res.order);
       }
     } else {
       showToast(res ? res.message : 'Order placed successfully! 🍕', 'success');
+    }
+  }
+
+  function proceedToTrackOrder() {
+    closeSuccessModal();
+    if (window.App && window.App.showLiveTracking && lastPlacedOrder) {
+      window.App.showLiveTracking(lastPlacedOrder);
+    }
+  }
+
+  function closeSuccessModal() {
+    const successModal = document.getElementById('order-success-modal-overlay');
+    if (successModal) {
+      successModal.classList.remove('open');
     }
   }
 
@@ -517,6 +547,8 @@ const Cart = (() => {
     closePaymentModal,
     selectPaymentMethod,
     handlePaymentConfirmation,
+    proceedToTrackOrder,
+    closeSuccessModal,
     handleApplyCoupon,
     quickApplyCoupon,
     getItems: () => cartItems,

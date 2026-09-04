@@ -533,6 +533,54 @@
   </div>
 
   <!-- =====================================================================
+       PAYMENT & ORDER SUCCESS MODAL
+       ===================================================================== -->
+  <div class="order-modal-overlay" id="order-success-modal-overlay">
+    <div class="order-tracking-card" style="max-width:460px; text-align:center; padding:36px 28px;">
+      <!-- Green Success Icon Animation -->
+      <div style="width:84px; height:84px; margin:0 auto 20px; background:#ecfdf5; border:3px solid #10b981; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 25px rgba(16,185,129,0.3);">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      </div>
+
+      <h2 style="font-size:26px; font-weight:900; color:#0f172a; margin-bottom:8px;">Order Confirmed! 🎉</h2>
+      <p style="font-size:14px; color:#64748b; margin-bottom:24px;">Your payment was successful and the kitchen has started preparing your fresh food.</p>
+
+      <!-- Order Receipt Card -->
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:18px; text-align:left; margin-bottom:24px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px;">
+          <span style="color:#64748b;">Order Number:</span>
+          <span style="font-weight:800; color:#0f172a;" id="success-order-num">#TRIG-849201</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px;">
+          <span style="color:#64748b;">Restaurant:</span>
+          <span style="font-weight:700; color:#0f172a;" id="success-rest-name">Meghana Foods Biryani</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:13px;">
+          <span style="color:#64748b;">Payment Method:</span>
+          <span style="font-weight:700; color:#10b981;" id="success-pay-method">UPI (Verified)</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding-top:10px; border-top:1px dashed #cbd5e1; font-size:15px; font-weight:800;">
+          <span style="color:#0f172a;">Amount Paid:</span>
+          <span style="color:#fc8019;" id="success-amount-paid">₹320</span>
+        </div>
+      </div>
+
+      <!-- Prominent Button: TRACK YOUR ORDER -->
+      <button class="confirm-pay-btn" id="success-track-btn" style="background:#10b981; font-size:16px; font-weight:900; padding:16px; letter-spacing:0.5px; box-shadow:0 6px 20px rgba(16,185,129,0.4); margin-bottom:12px; cursor:pointer;" onclick="Cart.proceedToTrackOrder()">
+        🛵 TRACK YOUR ORDER ➔
+      </button>
+
+      <div>
+        <button type="button" style="background:transparent; border:none; color:#64748b; font-size:13px; font-weight:700; cursor:pointer; padding:8px;" onclick="Cart.closeSuccessModal()">
+          Back to Home
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
        ORDER TRACKING & HISTORY MODAL
        ===================================================================== -->
   <div class="order-modal-overlay" id="order-modal-overlay">
