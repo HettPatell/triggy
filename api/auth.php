@@ -32,11 +32,16 @@ switch ($action) {
             jsonResponse(['success' => false, 'message' => 'Invalid email address format.'], 400);
         }
 
-        // Check if user already exists
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? OR phone = ?");
-        $stmt->execute([$email, $phone]);
+        // Check if user already exists by email
+        $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $stmt->execute([$email]);
         if ($stmt->fetch()) {
-            jsonResponse(['success' => false, 'message' => 'An account with this email or phone already exists.'], 409);
+            jsonResponse(['success' => false, 'message' => 'An account with this email already exists. Please login!'], 409);
+        }
+
+        // If phone is not provided, generate random phone
+        if (empty($phone)) {
+            $phone = '98' . rand(10000000, 99999999);
         }
 
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
@@ -50,7 +55,7 @@ switch ($action) {
 
         jsonResponse([
             'success' => true,
-            'message' => 'Registration successful! Welcome to Swiggy.',
+            'message' => 'Registration successful! Welcome to Triggy.',
             'user' => [
                 'id' => (int)$userId,
                 'name' => $name,

@@ -382,26 +382,39 @@ const API = (() => {
 
     // Auth
     async login(email, password) {
+      const normalizedEmail = (email || '').trim().toLowerCase();
+
       // 1. Check local registered users list first (allows new accounts created on Vercel to log in instantly!)
       const usersList = JSON.parse(localStorage.getItem('swiggy_users_list') || '[]');
-      const localMatched = usersList.find(u => (u.email && u.email.toLowerCase() === email.toLowerCase()) || (u.phone && u.phone === email));
-      if (localMatched && (!localMatched.password || localMatched.password === password)) {
-        localStorage.setItem('swiggy_user', JSON.stringify(localMatched));
-        return { success: true, message: `Welcome back, ${localMatched.name}!`, user: localMatched };
+      const localMatched = usersList.find(u => 
+        (u.email && u.email.toLowerCase() === normalizedEmail) || 
+        (u.phone && u.phone === email)
+      );
+      if (localMatched) {
+        if (!localMatched.password || localMatched.password === password) {
+          localStorage.setItem('swiggy_user', JSON.stringify(localMatched));
+          return { success: true, message: `Welcome back, ${localMatched.name}!`, user: localMatched };
+        } else {
+          return { success: false, message: 'Incorrect password. Please try again!' };
+        }
       }
 
       // 2. Try backend API
-      const res = await fetchJSON(`${BASE_URL}/auth.php?action=login`, {
-        method: 'POST',
-        body: JSON.stringify({ email, password })
-      });
-      if (res && res.success) {
-        if (res.user) localStorage.setItem('swiggy_user', JSON.stringify(res.user));
+      let res = null;
+      try {
+        res = await fetchJSON(`${BASE_URL}/auth.php?action=login`, {
+          method: 'POST',
+          body: JSON.stringify({ email: normalizedEmail, password })
+        });
+      } catch (e) {}
+
+      if (res && res.success && res.user) {
+        localStorage.setItem('swiggy_user', JSON.stringify(res.user));
         return res;
       }
 
       // 3. Demo fallback credentials
-      if (email.toLowerCase() === 'rahul@example.com' && (password === '123456' || password === 'swiggy123')) {
+      if (normalizedEmail === 'rahul@example.com' && (password === '123456' || password === 'swiggy123')) {
         const mockUser = { id: 1, name: 'Rahul Sharma', email: 'rahul@example.com', phone: '9876543210', address: 'Flat 402, Sunshine Heights, Koramangala 4th Block, Bangalore' };
         localStorage.setItem('swiggy_user', JSON.stringify(mockUser));
         return { success: true, message: 'Logged in successfully!', user: mockUser };
@@ -409,45 +422,54 @@ const API = (() => {
 
       if (res && !res.success) return res;
 
-      return { success: false, message: 'Invalid credentials. Click "create an account" to register!' };
+      return { success: false, message: 'Invalid credentials. Click "Create Account" to sign up!' };
     },
 
     async register(data) {
+      const normalizedEmail = (data.email || '').trim().toLowerCase();
+      const cleanData = {
+        name: (data.name || '').trim(),
+        email: normalizedEmail,
+        phone: (data.phone || '').trim() || ('98' + Math.floor(10000000 + Math.random() * 90000000)),
+        password: data.password || '',
+        address: data.address || 'Koramangala, Bangalore'
+      };
+
       let res = null;
       try {
         res = await fetchJSON(`${BASE_URL}/auth.php?action=register`, {
           method: 'POST',
-          body: JSON.stringify(data)
+          body: JSON.stringify(cleanData)
         });
       } catch (e) {}
 
-      if (res && res.success) {
-        if (res.user) localStorage.setItem('swiggy_user', JSON.stringify(res.user));
-        // Save to users list
+      if (res && res.success && res.user) {
+        localStorage.setItem('swiggy_user', JSON.stringify(res.user));
         const usersList = JSON.parse(localStorage.getItem('swiggy_users_list') || '[]');
-        usersList.push(res.user);
-        localStorage.setItem('swiggy_users_list', JSON.stringify(usersList));
+        const cleanList = usersList.filter(u => (u.email || '').toLowerCase() !== cleanData.email);
+        cleanList.push({ ...res.user, password: cleanData.password });
+        localStorage.setItem('swiggy_users_list', JSON.stringify(cleanList));
         return res;
       }
 
-      if (res && res.message && res.message.includes('already exists')) {
+      if (res && res.message && (res.message.includes('already exists') || res.message.includes('already registered'))) {
         return res;
       }
 
       // Standalone / Vercel Fallback: Create and save user locally so registration NEVER fails!
       const usersList = JSON.parse(localStorage.getItem('swiggy_users_list') || '[]');
-      const existing = usersList.find(u => u.email && u.email.toLowerCase() === data.email.toLowerCase());
+      const existing = usersList.find(u => u.email && u.email.toLowerCase() === cleanData.email);
       if (existing) {
         return { success: false, message: 'An account with this email already exists. Please login!' };
       }
 
       const newUser = {
         id: Date.now(),
-        name: data.name || 'Food Lover',
-        email: data.email,
-        phone: data.phone || '9876543210',
-        password: data.password,
-        address: data.address || 'Koramangala, Bangalore'
+        name: cleanData.name || 'Food Lover',
+        email: cleanData.email,
+        phone: cleanData.phone,
+        password: cleanData.password,
+        address: cleanData.address
       };
       usersList.push(newUser);
       localStorage.setItem('swiggy_users_list', JSON.stringify(usersList));
@@ -455,7 +477,7 @@ const API = (() => {
 
       return {
         success: true,
-        message: 'Registration successful! Welcome to Triggy. 🎉',
+        message: `Registration successful! Welcome to Triggy, ${newUser.name}. 🎉`,
         user: newUser
       };
     },
