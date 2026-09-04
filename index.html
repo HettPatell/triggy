@@ -77,7 +77,7 @@
           </li>
 
           <!-- User Account / Sign In -->
-          <li class="nav-item profile-menu-container" id="user-nav-btn">
+          <li class="nav-item profile-menu-container" id="user-nav-btn" onclick="Auth.handleUserNavClick(event)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
@@ -102,7 +102,7 @@
               <a href="setup_db.php" target="_blank" class="profile-drop-item" style="text-decoration:none;">
                 <span>⚙️ Database Manager</span>
               </a>
-              <div class="profile-drop-item" id="logout-btn" style="color:var(--danger); border-top:1px solid var(--border-color);">
+              <div class="profile-drop-item" id="logout-btn" style="color:var(--danger); border-top:1px solid var(--border-color);" onclick="Auth.handleLogout()">
                 <span>🚪 Sign Out</span>
               </div>
             </div>
@@ -384,7 +384,7 @@
           </button>
         </div>
 
-        <form id="auth-form" class="auth-form">
+        <form id="auth-form" class="auth-form" onsubmit="Auth.handleAuthSubmit(event); return false;">
           <div class="form-group" id="name-group" style="display:none;">
             <label class="form-label" for="auth-name">Full Name <span style="color:#e53935;">*</span></label>
             <input type="text" id="auth-name" class="form-input" placeholder="e.g. Rahul Sharma" autocomplete="name">
@@ -405,7 +405,7 @@
             <input type="password" id="auth-password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
           </div>
 
-          <button type="submit" class="auth-submit-btn" id="auth-submit-btn">LOGIN</button>
+          <button type="submit" class="auth-submit-btn" id="auth-submit-btn" onclick="Auth.handleAuthSubmit(event)">LOGIN</button>
           
           <div class="auth-terms-text" style="text-align:center; margin-top:14px;">
             <span id="auth-bottom-toggle" style="color:var(--primary); font-weight:700; cursor:pointer;" onclick="Auth.toggleAuthMode()">

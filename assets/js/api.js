@@ -384,7 +384,14 @@ const API = (() => {
     async login(email, password) {
       const normalizedEmail = (email || '').trim().toLowerCase();
 
-      // 1. Check local registered users list first (allows new accounts created on Vercel to log in instantly!)
+      // 1. Demo fallback credentials (instant, guaranteed 100% login)
+      if (normalizedEmail === 'rahul@example.com' && (password === '123456' || password === 'swiggy123')) {
+        const mockUser = { id: 1, name: 'Rahul Sharma', email: 'rahul@example.com', phone: '9876543210', address: 'Flat 402, Sunshine Heights, Koramangala 4th Block, Bangalore' };
+        localStorage.setItem('swiggy_user', JSON.stringify(mockUser));
+        return { success: true, message: 'Logged in successfully!', user: mockUser };
+      }
+
+      // 2. Check local registered users list (allows new accounts created on Vercel or locally to log in immediately)
       const usersList = JSON.parse(localStorage.getItem('swiggy_users_list') || '[]');
       const localMatched = usersList.find(u => 
         (u.email && u.email.toLowerCase() === normalizedEmail) || 
@@ -399,7 +406,7 @@ const API = (() => {
         }
       }
 
-      // 2. Try backend API
+      // 3. Try backend API
       let res = null;
       try {
         res = await fetchJSON(`${BASE_URL}/auth.php?action=login`, {
@@ -411,13 +418,6 @@ const API = (() => {
       if (res && res.success && res.user) {
         localStorage.setItem('swiggy_user', JSON.stringify(res.user));
         return res;
-      }
-
-      // 3. Demo fallback credentials
-      if (normalizedEmail === 'rahul@example.com' && (password === '123456' || password === 'swiggy123')) {
-        const mockUser = { id: 1, name: 'Rahul Sharma', email: 'rahul@example.com', phone: '9876543210', address: 'Flat 402, Sunshine Heights, Koramangala 4th Block, Bangalore' };
-        localStorage.setItem('swiggy_user', JSON.stringify(mockUser));
-        return { success: true, message: 'Logged in successfully!', user: mockUser };
       }
 
       if (res && !res.success) return res;
@@ -490,12 +490,15 @@ const API = (() => {
 
     async checkAuth() {
       const res = await fetchJSON(`${BASE_URL}/auth.php?action=me`);
-      if (res && res.logged_in) return res;
+      if (res && res.logged_in && res.user && (res.user.id || res.user.email || res.user.name)) return res;
 
       const localUser = localStorage.getItem('swiggy_user');
       if (localUser) {
         try {
-          return { logged_in: true, user: JSON.parse(localUser) };
+          const parsed = JSON.parse(localUser);
+          if (parsed && (parsed.id || parsed.email || parsed.name)) {
+            return { logged_in: true, user: parsed };
+          }
         } catch (e) {}
       }
       return { logged_in: false, user: null };

@@ -76,10 +76,6 @@ const Auth = (() => {
       authForm.addEventListener('submit', handleAuthSubmit);
     }
 
-    if (userNavBtn) {
-      userNavBtn.addEventListener('click', handleUserNavClick);
-    }
-
     // Close profile dropdown when clicking outside
     document.addEventListener('click', (e) => {
       if (profileDropdown && userNavBtn && !userNavBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
@@ -179,17 +175,40 @@ const Auth = (() => {
     }
   }
 
+  let isSubmitting = false;
+
   function openAuthDrawer(signUp = false) {
     cacheDOM();
-    isSignUpMode = signUp;
+    isSignUpMode = !!signUp;
     updateModalView();
-    if (authDrawerOverlay) authDrawerOverlay.classList.add('open');
+    const overlay = authDrawerOverlay || document.getElementById('auth-drawer-overlay');
+    if (overlay) {
+      overlay.classList.add('open');
+      overlay.style.opacity = '1';
+      overlay.style.visibility = 'visible';
+      overlay.style.pointerEvents = 'auto';
+      const drawer = overlay.querySelector('.auth-drawer');
+      if (drawer) {
+        drawer.style.transform = 'translateX(0)';
+      }
+    }
   }
 
   function closeAuthDrawer() {
     cacheDOM();
-    if (authDrawerOverlay) authDrawerOverlay.classList.remove('open');
-    if (authAlertBox) authAlertBox.style.display = 'none';
+    const overlay = authDrawerOverlay || document.getElementById('auth-drawer-overlay');
+    if (overlay) {
+      overlay.classList.remove('open');
+      overlay.style.opacity = '';
+      overlay.style.visibility = '';
+      overlay.style.pointerEvents = '';
+      const drawer = overlay.querySelector('.auth-drawer');
+      if (drawer) {
+        drawer.style.transform = '';
+      }
+    }
+    const alertBox = authAlertBox || document.getElementById('auth-alert-box');
+    if (alertBox) alertBox.style.display = 'none';
   }
 
   function showAlert(msg, isSuccess = false) {
@@ -205,15 +224,21 @@ const Auth = (() => {
   }
 
   async function handleAuthSubmit(e) {
-    if (e) e.preventDefault();
+    if (e) {
+      try { e.preventDefault(); } catch (err) {}
+      try { e.stopPropagation(); } catch (err) {}
+    }
+    if (isSubmitting) return false;
+    isSubmitting = true;
     cacheDOM();
 
-    const email = emailInput ? emailInput.value.trim() : '';
-    const password = passwordInput ? passwordInput.value.trim() : '';
+    const email = ((emailInput || document.getElementById('auth-email'))?.value || '').trim();
+    const password = ((passwordInput || document.getElementById('auth-password'))?.value || '').trim();
 
     if (!email || !password) {
       showAlert('Please enter both email and password.');
-      return;
+      isSubmitting = false;
+      return false;
     }
 
     if (submitBtn) {
@@ -223,12 +248,15 @@ const Auth = (() => {
 
     try {
       if (isSignUpMode) {
-        const name = (nameInput ? nameInput.value.trim() : '') || 'Food Lover';
-        let phone = (phoneInput ? phoneInput.value.trim() : '');
+        const nameInputEl = nameInput || document.getElementById('auth-name');
+        const phoneInputEl = phoneInput || document.getElementById('auth-phone');
+        const name = (nameInputEl ? nameInputEl.value.trim() : '') || 'Food Lover';
+        let phone = (phoneInputEl ? phoneInputEl.value.trim() : '');
         if (!name) {
           showAlert('Please enter your full name.');
           if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'CREATE ACCOUNT'; }
-          return;
+          isSubmitting = false;
+          return false;
         }
         if (!phone) {
           phone = '98' + Math.floor(10000000 + Math.random() * 90000000);
@@ -264,6 +292,7 @@ const Auth = (() => {
       console.error('Auth error:', err);
       showAlert('An unexpected error occurred. Please try again.');
     } finally {
+      isSubmitting = false;
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = isSignUpMode ? 'CREATE ACCOUNT' : 'LOGIN';
@@ -281,13 +310,16 @@ const Auth = (() => {
   }
 
   function handleUserNavClick(e) {
-    if (e) e.stopPropagation();
+    if (e) {
+      try { e.stopPropagation(); } catch (err) {}
+    }
     cacheDOM();
-    if (profileDropdown && profileDropdown.contains(e.target) && e.target !== profileDropdown) {
+    const dropdown = profileDropdown || document.getElementById('profile-dropdown');
+    if (dropdown && e && e.target && dropdown.contains(e.target) && e.target !== dropdown) {
       return;
     }
-    if (currentUser) {
-      if (profileDropdown) profileDropdown.classList.toggle('open');
+    if (currentUser && (currentUser.name || currentUser.email || currentUser.id)) {
+      if (dropdown) dropdown.classList.toggle('open');
     } else {
       openAuthDrawer(false);
     }
@@ -295,8 +327,10 @@ const Auth = (() => {
 
   async function quickDemoLogin() {
     cacheDOM();
-    if (emailInput) emailInput.value = 'rahul@example.com';
-    if (passwordInput) passwordInput.value = '123456';
+    const emailEl = emailInput || document.getElementById('auth-email');
+    const passEl = passwordInput || document.getElementById('auth-password');
+    if (emailEl) emailEl.value = 'rahul@example.com';
+    if (passEl) passEl.value = '123456';
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.textContent = 'Logging in...';
@@ -331,10 +365,18 @@ const Auth = (() => {
     toggleAuthMode,
     handleAuthSubmit,
     handleUserNavClick,
+    handleLogout,
     quickDemoLogin,
     getUser: () => currentUser
   };
 })();
+
+// Auto-initialize Auth when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => Auth.init());
+} else {
+  Auth.init();
+}
 
 // Utility toast notification
 function showToast(message, type = 'success') {
